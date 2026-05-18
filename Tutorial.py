@@ -1,50 +1,18 @@
 # Online Tutorials to generate GUI 
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QGridLayout
+from PyQt6 import uic
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        #Window
-        self.setWindowTitle("My App")
-        self.setFixedSize(QSize(400, 300))
+        uic.loadUi('QTDesignerTest.ui',self)
+        self.pushButton.clicked.connect(self.pushButtonClicked)
 
-        #Layout
-        layout = QGridLayout()
-        central_widget = QWidget()
-        self.setCentralWidget(central_widget)
-        central_widget.setLayout(layout)
-
-        #Widget Creation
-        button = QPushButton("Press Me!")
-
-        # Widget Customization
-        # button.setStyleSheet("""
-        #                     width: 100px;
-        #                     height: 100px;
-        #                     border: 4px solid blue;
-        #                     border-radius: 50%;""") 
-        
-        # Test 2
-        button.setStyleSheet("""
-                            background-color: #e8f4ff;
-                            border: 2px solid #64b5f6;
-                            border-radius: 20px;
-                            padding: 10px 24px;
-                            font-size: 16px;
-                            color: #1565c0;
-                            """)
-
-        #Add button to Layout
-        layout.addWidget(button,2,2,alignment=Qt.AlignmentFlag.AlignCenter)
-        
-        button.clicked.connect(self.buttonClicked)
-
-    def buttonClicked(self):
-        print("it clicked!")
-
-    def appRun(self):
-        print("test App Run")
+    def pushButtonClicked(self):
+        print("Button clicked!")
+        self.textBrowser.clear()
+        self.textBrowser.setText("test")
         
 def main():
     print("test main program")
