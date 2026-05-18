@@ -1,18 +1,47 @@
 # Online Tutorials to generate GUI 
 from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton
+from PyQt6.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QGridLayout
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        #Window
         self.setWindowTitle("My App")
-
-        button = QPushButton("Press Me!")
-
         self.setFixedSize(QSize(400, 300))
 
-        # Set the central widget of the Window.
-        self.setCentralWidget(button)
+        #Layout
+        layout = QGridLayout()
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        central_widget.setLayout(layout)
+
+        #Widget Creation
+        button = QPushButton("Press Me!")
+
+        # Widget Customization
+        # button.setStyleSheet("""
+        #                     width: 100px;
+        #                     height: 100px;
+        #                     border: 4px solid blue;
+        #                     border-radius: 50%;""") 
+        
+        # Test 2
+        button.setStyleSheet("""
+                            background-color: #e8f4ff;
+                            border: 2px solid #64b5f6;
+                            border-radius: 20px;
+                            padding: 10px 24px;
+                            font-size: 16px;
+                            color: #1565c0;
+                            """)
+
+        #Add button to Layout
+        layout.addWidget(button,2,2,alignment=Qt.AlignmentFlag.AlignCenter)
+        
+        button.clicked.connect(self.buttonClicked)
+
+    def buttonClicked(self):
+        print("it clicked!")
 
     def appRun(self):
         print("test App Run")
