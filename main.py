@@ -37,10 +37,8 @@ class MainWindow(QMainWindow):
         # set up displays #
         self.lcdNumber.display(self.defaultProject.time)
         # set up buttons #
-        self.pushButton.clicked.connect(self.start_timer)
-        self.pushButton.clicked.connect(self.pushButtonClicked)
-        self.pushButton_2.clicked.connect(self.pushButtonClicked2)
-        self.pushButton_2.clicked.connect(self.stop_timer)
+        self.pushButton.setCheckable(True)
+        self.pushButton.toggled.connect(self.pushButtonToggled)
 
     def start_timer(self):
         self.count = 0
@@ -52,12 +50,13 @@ class MainWindow(QMainWindow):
         print("timer stopped")
         self.defaultProject.time += self.count
 
-    def pushButtonClicked(self):
+    def pushButtonToggled(self):
+        # Toggle function not working quite like I'd like
         self.textBrowser.clear()
         self.textBrowser.setText(self.defaultProject.name)
-
-    def pushButtonClicked2(self):
-        self.textBrowser.setText("button 2 pressed")
+        isChecked = self.pushButton.isChecked()
+        if (isChecked): self.start_timer()
+        if not (isChecked): self.stop_timer()
 
     def update_display(self):
         print("fire")
@@ -88,8 +87,6 @@ def main():
     # loop has stopped.
     print("test program closing \n")
 
-    #TODO: ExportData
-    print(window.get_final_time())
     window.upload_final_data()
 
 if __name__ == "__main__":
