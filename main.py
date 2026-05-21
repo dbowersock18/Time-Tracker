@@ -2,49 +2,72 @@
 from PyQt6.QtCore import QSize, Qt, QTimer
 from PyQt6.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QGridLayout
 from PyQt6 import uic
+import json
 from ProjectClass import ProjectClass
+
+def get_json_project_data() -> dict:
+    with open('data.json', 'r') as f:
+        data_dict = json.load(f)
+    return data_dict
+
+def set_json_project_data(project : ProjectClass):
+    data_dict = {
+        "project_name" : project.name,
+        "time" : project.time
+    }
+    with open('data.json', 'w') as f:
+        json.dump(data_dict, f, indent=4)
+
 
 class MainWindow(QMainWindow):
     #TODO: Import data into test projects
-    defaultProject = ProjectClass("test project", 0)
+    data_dict = get_json_project_data()
+    defaultProject = ProjectClass(data_dict["project_name"],data_dict["time"])
     count: int = 0
     timer : QTimer
 
     def __init__(self):
         super().__init__()
-        uic.loadUi('QTDesignerTest.ui',self)
+        uic.loadUi('QTDesignerTest.ui',self) #loads custom UI
+        MainWindow.setWindowTitle(self,"Project Tracker!")
+        # set up timer #
         self.timer = QTimer(self)
-        self.timer.setInterval(2000)
+        self.timer.setInterval(1000) #fires every second
         self.timer.timeout.connect(self.update_display)
-        self.pushButton.clicked.connect(self.start_timer)
-        self.pushButton.clicked.connect(self.pushButtonClicked)
-        self.pushButton_2.clicked.connect(self.pushButtonClicked2)
-        self.pushButton_2.clicked.connect(self.stop_timer)
+        # set up displays #
+        self.lcdNumber.display(self.defaultProject.time)
+        # set up buttons #
+        self.pushButton.setCheckable(True)
+        self.pushButton.toggled.connect(self.pushButtonToggled)
 
     def start_timer(self):
+        self.count = 0
         self.timer.start()
         print("timer started")
 
     def stop_timer(self):
         self.timer.stop()
         print("timer stopped")
-        print(self.count)
         self.defaultProject.time += self.count
 
-    def pushButtonClicked(self):
+    def pushButtonToggled(self):
+        # Toggle function not working quite like I'd like
         self.textBrowser.clear()
         self.textBrowser.setText(self.defaultProject.name)
-
-    def pushButtonClicked2(self):
-        self.textBrowser.setText("button 2 pressed")
+        isChecked = self.pushButton.isChecked()
+        if (isChecked): self.start_timer()
+        if not (isChecked): self.stop_timer()
 
     def update_display(self):
         print("fire")
-        self.count = self.count + 1
-        self.lcdNumber.display(self.count)
+        self.count += 1
+        self.lcdNumber.display(self.defaultProject.time + self.count)
 
     def get_final_time(self):
         return self.defaultProject.time
+    
+    def upload_final_data(self):
+        set_json_project_data(self.defaultProject)
         
 def main():
     print("test main program")
@@ -64,8 +87,7 @@ def main():
     # loop has stopped.
     print("test program closing \n")
 
-    #TODO: ExportData
-    print(window.get_final_time())
+    window.upload_final_data()
 
 if __name__ == "__main__":
     main()
