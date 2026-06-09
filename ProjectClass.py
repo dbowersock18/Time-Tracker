@@ -1,4 +1,4 @@
-class ProjectClass: 
+class Project: 
     name: str
     time: int
     

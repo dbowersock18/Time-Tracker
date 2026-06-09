@@ -3,30 +3,38 @@ from PyQt6.QtCore import QSize, Qt, QTimer
 from PyQt6.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QGridLayout
 from PyQt6 import uic
 import json
-from ProjectClass import ProjectClass
+from ProjectClass import Project
 
 def get_json_project_data() -> dict:
     with open('data.json', 'r') as f:
         data_dict = json.load(f)
     return data_dict
 
-def set_json_project_data(project : ProjectClass):
-    data_dict = {
-        "project_name" : project.name,
-        "time" : project.time
-    }
+#TODO: EDIT BELOW
+def set_json_project_data(data_dict : dict):
+    data_dict_write = {}
+    for key, project in data_dict.items():
+        data_dict_write[key] = {
+            "projectName" : project.name,
+            "time" : project.time
+        }
+    
     with open('data.json', 'w') as f:
-        json.dump(data_dict, f, indent=4)
-
+        json.dump(data_dict_write, f, indent=4)
 
 class MainWindow(QMainWindow):
-    #TODO: Import data into test projects
-    data_dict = get_json_project_data()
-    defaultProject = ProjectClass(data_dict["project_name"],data_dict["time"])
-    count: int = 0
+    data_dict_json = get_json_project_data()
+    # creates a dictionary of Projects (Class) to keep track of 
+    data_dict = {}
+    for key, value in data_dict_json.items():
+        project = Project(value["projectName"], value["time"])
+        data_dict[key] = project
     timer : QTimer
+    current_project = data_dict[next(iter(data_dict))]
 
     def __init__(self):
+        default_name = self.current_project.name
+        default_time = self.current_project.time
         super().__init__()
         uic.loadUi('QTDesignerTest.ui',self) #loads custom UI
         MainWindow.setWindowTitle(self,"Project Tracker!")
@@ -35,46 +43,46 @@ class MainWindow(QMainWindow):
         self.timer.setInterval(1000) #fires every second
         self.timer.timeout.connect(self.update_display)
         # set up displays #
-        self.lcdNumber.display(self.defaultProject.time)
+        self.lcdNumber.display(default_time)
+        self.comboBox.setCurrentText(default_name)
         # set up buttons #
         self.pushButton.setCheckable(True)
         self.pushButton.toggled.connect(self.pushButtonToggled)
+        # Setup ComboBox
+        for keys in self.data_dict:
+            self.comboBox.addItem(self.data_dict[keys].name)
+        self.comboBox.textActivated.connect(self.on_selection_change)
 
     def start_timer(self):
-        self.count = 0
         self.timer.start()
         print("timer started")
 
     def stop_timer(self):
         self.timer.stop()
         print("timer stopped")
-        self.defaultProject.time += self.count
 
     def pushButtonToggled(self):
-        # Toggle function not working quite like I'd like
-        self.textBrowser.clear()
-        self.textBrowser.setText(self.defaultProject.name)
+        # self.textBrowser.clear()
         isChecked = self.pushButton.isChecked()
         if (isChecked): self.start_timer()
         if not (isChecked): self.stop_timer()
 
+    def on_selection_change(self, text): 
+        self.current_project = self.data_dict[text]
+        self.lcdNumber.display(self.current_project.time)
+
     def update_display(self):
         print("fire")
-        self.count += 1
-        self.lcdNumber.display(self.defaultProject.time + self.count)
-
-    def get_final_time(self):
-        return self.defaultProject.time
+        self.current_project.time += 1
+        self.lcdNumber.display(self.current_project.time)
     
-    def upload_final_data(self):
-        set_json_project_data(self.defaultProject)
+    def project_close(self):
+        set_json_project_data(self.data_dict)
         
 def main():
     print("test main program")
     # You need one (and only one) QApplication instance per application.
     app = QApplication([])
-    
-    # Create default Project 
 
     # Create a Qt widget, which will be our window.
     window = MainWindow()
@@ -87,7 +95,7 @@ def main():
     # loop has stopped.
     print("test program closing \n")
 
-    window.upload_final_data()
+    window.project_close()
 
 if __name__ == "__main__":
     main()
