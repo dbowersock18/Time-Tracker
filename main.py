@@ -4,13 +4,13 @@ from PyQt6.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QGr
 from PyQt6 import uic
 import json
 from ProjectClass import Project
+from PyQt6.QtGui import QIcon
 
 def get_json_project_data() -> dict:
     with open('data.json', 'r') as f:
         data_dict = json.load(f)
     return data_dict
 
-#TODO: EDIT BELOW
 def set_json_project_data(data_dict : dict):
     data_dict_write = {}
     for key, project in data_dict.items():
@@ -38,6 +38,8 @@ class MainWindow(QMainWindow):
         super().__init__()
         uic.loadUi('QTDesignerTest.ui',self) #loads custom UI
         MainWindow.setWindowTitle(self,"Project Tracker!")
+        # Set up smaller window
+        self.second_window = self.SmallerWindow(self)
         # set up timer #
         self.timer = QTimer(self)
         self.timer.setInterval(1000) #fires every second
@@ -53,6 +55,13 @@ class MainWindow(QMainWindow):
             self.comboBox.addItem(self.data_dict[keys].name)
         self.comboBox.textActivated.connect(self.on_selection_change)
 
+    def resizeEvent(self, event):
+        new_width = event.size().width()
+        if new_width < 200:
+            self.second_window.resize(100,50)
+            self.second_window.show()
+            self.hide() 
+        
     def start_timer(self):
         self.timer.start()
         print("timer started")
@@ -78,6 +87,19 @@ class MainWindow(QMainWindow):
     
     def project_close(self):
         set_json_project_data(self.data_dict)
+
+    class SmallerWindow(QMainWindow):
+    # Pass along the parent, the larger window, to never lose a reference to it!
+        def __init__(self, parent):
+            super().__init__()
+            uic.loadUi('smaller_window.ui', self)
+            self.parent = parent
+
+        def resizeEvent(self, event):
+            new_width = event.size().width()
+            if new_width > 150:
+                self.hide()
+                self.parent.show()
         
 def main():
     print("test main program")
