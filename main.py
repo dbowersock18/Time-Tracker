@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QGr
 from PyQt6 import uic
 import json
 from ProjectClass import Project
+from PyQt6.QtGui import QPixmap
 from PyQt6.QtGui import QIcon
 
 def get_json_project_data() -> dict:
@@ -33,6 +34,7 @@ class MainWindow(QMainWindow):
     current_project = data_dict[next(iter(data_dict))]
 
     def __init__(self):
+        # Project Name and Time on Load
         default_name = self.current_project.name
         default_time = self.current_project.time
         super().__init__()
@@ -58,7 +60,7 @@ class MainWindow(QMainWindow):
     def resizeEvent(self, event):
         new_width = event.size().width()
         if new_width < 200:
-            self.second_window.resize(100,50)
+            self.second_window.resize(135,135)
             self.second_window.show()
             self.hide() 
         
@@ -79,11 +81,13 @@ class MainWindow(QMainWindow):
     def on_selection_change(self, text): 
         self.current_project = self.data_dict[text]
         self.lcdNumber.display(self.current_project.time)
+        self.second_window.pushButton.setText("\n \n \n" + str(self.current_project.time))
 
     def update_display(self):
         print("fire")
         self.current_project.time += 1
         self.lcdNumber.display(self.current_project.time)
+        self.second_window.pushButton.setText("\n \n \n" + str(self.current_project.time))
     
     def project_close(self):
         set_json_project_data(self.data_dict)
@@ -93,13 +97,42 @@ class MainWindow(QMainWindow):
         def __init__(self, parent):
             super().__init__()
             uic.loadUi('smaller_window.ui', self)
+            self.setWindowTitle("Click to Log")
             self.parent = parent
+            # Set actions of PushButton
+            self.pushButton.setCheckable(True)
+            # Updates Count
+            self.pushButton.toggled.connect(self.pushButtonToggledSmall)
+            # set Style of PushButton
+            self.pushButton.setText("\n \n \n" + str(parent.current_project.time))
+            self.pushButton.setStyleSheet("""
+                                    background-image: url('mountain_button_2.png') 0 0 0 0 stretch stretch;
+                                    background-position: center;
+                                    background-repeat: no-repeat;
+                                    font-weight: bold;
+                                          """)
+            self.setCentralWidget(self.pushButton)
+            # Formats Window's window
+            self.setWindowFlag(Qt.WindowType.CustomizeWindowHint, True)
+            self.setWindowFlag(Qt.WindowType.WindowMinimizeButtonHint, False)
+            self.setWindowFlag(Qt.WindowType.WindowMaximizeButtonHint, False)
+            self.setWindowFlag(Qt.WindowType.WindowTitleHint, False)
+            ## The two below are commented as you can't move windown without
+            # self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
+            self.setWindowFlag(Qt.WindowType.WindowTitleHint, False)
+
+        def pushButtonToggledSmall(self):
+            isChecked = self.pushButton.isChecked()
+            if (isChecked): self.parent.start_timer()
+            if not (isChecked): self.parent.stop_timer()
 
         def resizeEvent(self, event):
             new_width = event.size().width()
             if new_width > 150:
                 self.hide()
                 self.parent.show()
+
+
         
 def main():
     print("test main program")

@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="button">
+    <file>mountain_button.png</file>
+  </qresource>
+</RCC>

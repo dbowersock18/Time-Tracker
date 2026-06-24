@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>103</width>
-    <height>55</height>
+    <width>125</width>
+    <height>125</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,15 +18,44 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>100</width>
-     <height>50</height>
+     <width>125</width>
+     <height>125</height>
     </rect>
    </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>125</width>
+     <height>125</height>
+    </size>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
    <property name="text">
-    <string>PushButton</string>
+    <string>
+ 
+
+ PushButton</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>50</width>
+     <height>31</height>
+    </size>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="main.qrc"/>
+ </resources>
  <connections/>
 </ui>
