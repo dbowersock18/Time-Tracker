@@ -1,11 +1,10 @@
 # Online Tutorials to generate GUI 
-from PyQt6.QtCore import QSize, Qt, QTimer
-from PyQt6.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QGridLayout
+from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtWidgets import QApplication, QMainWindow, QInputDialog
 from PyQt6 import uic
 import json
 from ProjectClass import Project
-from PyQt6.QtGui import QPixmap
-from PyQt6.QtGui import QIcon
+
 
 def get_json_project_data() -> dict:
     with open('data.json', 'r') as f:
@@ -53,13 +52,14 @@ class MainWindow(QMainWindow):
         self.pushButton.setCheckable(True)
         self.pushButton.toggled.connect(self.pushButtonToggled)
         # Setup ComboBox
-        for keys in self.data_dict:
-            self.comboBox.addItem(self.data_dict[keys].name)
+        self.update_combobox()
         self.comboBox.textActivated.connect(self.on_selection_change)
+        # Setup Add Project
+        self.addButton.toggled.connect(self.add_button_clicked)
 
     def resizeEvent(self, event):
-        new_width = event.size().width()
-        if new_width < 200:
+        new_height = event.size().height()
+        if new_height < 150:
             self.second_window.resize(135,135)
             self.second_window.show()
             self.hide() 
@@ -89,6 +89,26 @@ class MainWindow(QMainWindow):
         self.lcdNumber.display(self.current_project.time)
         self.second_window.pushButton.setText("\n \n \n" + str(self.current_project.time))
     
+    def add_project(self,project_name: str):
+        new_project = Project(project_name, 0)
+        self.data_dict[project_name] = new_project
+
+    def update_combobox(self):
+         for keys in self.data_dict:
+            found = 0
+            for i in range (self.comboBox.count()):
+                if (self.comboBox.itemText(i) == self.data_dict[keys].name):
+                    found = 1
+                    break
+            if (not found):
+                self.comboBox.addItem(self.data_dict[keys].name)
+
+    def add_button_clicked(self):
+        print("button toggled")
+        msg, ok_text = QInputDialog.getText(self,"Question","Name of Project?")
+        self.add_project(msg)
+        self.update_combobox()
+
     def project_close(self):
         set_json_project_data(self.data_dict)
 
@@ -127,13 +147,11 @@ class MainWindow(QMainWindow):
             if not (isChecked): self.parent.stop_timer()
 
         def resizeEvent(self, event):
-            new_width = event.size().width()
-            if new_width > 150:
+            new_height = event.size().height()
+            if new_height > 200:
                 self.hide()
                 self.parent.show()
 
-
-        
 def main():
     print("test main program")
     # You need one (and only one) QApplication instance per application.
