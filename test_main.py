@@ -1,8 +1,6 @@
 from ProjectClass import ProjectClass
 import json 
 
-#Possible bug TODO: exit out of project name it creates a blank project
-
 def serialized_date( test : ProjectClass ) -> dict:
     #Projets should be nested dictionaries?
     # try for now just to input one project

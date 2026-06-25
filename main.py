@@ -106,8 +106,9 @@ class MainWindow(QMainWindow):
     def add_button_clicked(self):
         print("button toggled")
         msg, ok_text = QInputDialog.getText(self,"Question","Name of Project?")
-        self.add_project(msg)
-        self.update_combobox()
+        if ok_text:
+            self.add_project(msg)
+            self.update_combobox()
 
     def project_close(self):
         set_json_project_data(self.data_dict)
